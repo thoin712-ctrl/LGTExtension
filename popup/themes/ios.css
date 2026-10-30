@@ -1,0 +1,22 @@
+.qt-shell { display: grid; grid-template-columns: 256px 1fr; min-height: 100vh; }
+.qt-sidebar { position: sticky; top: 0; height: 100vh; overflow: auto; background: #f8f9fa; border-right: 1px solid rgba(0,0,0,0.06); padding: 14px 12px; color: rgba(33,37,41,0.9); }
+.qt-brand { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: center; padding: 6px 6px 14px 6px; }
+.qt-logo { width: 38px; height: 38px; border-radius: 12px; background: rgba(0,0,0,0.06); color: #212529; display: grid; place-items: center; font-weight: 900; letter-spacing: 0.5px; border: 1px solid rgba(0,0,0,0.08); }
+.qt-title { font-weight: 800; line-height: 1.1; }
+.qt-subtitle { font-size: 12px; color: rgba(33,37,41,0.65); }
+.qt-nav { display: grid; gap: 4px; padding-top: 6px; }
+.qt-nav-link { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: center; padding: 9px 10px; border-radius: 12px; color: rgba(33,37,41,0.9); text-decoration: none; }
+.qt-nav-link:hover { background: rgba(0,0,0,0.04); color: #212529; }
+.qt-nav-link:focus { outline: none; box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.18); }
+.qt-ic { opacity: 0.95; }
+.qt-main { min-width: 0; }
+.qt-main { --qt-sticky-top: 62px; }
+.qt-topbar { background: rgba(255,255,255,0.95); border-bottom: 1px solid rgba(0,0,0,0.08); z-index: 10; }
+.qt-topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; }
+.qt-topbar-left { display: grid; }
+.qt-content { max-width: 1280px; }
+
+@media (max-width: 980px) {
+    .qt-shell { grid-template-columns: 1fr; }
+    .qt-sidebar { position: relative; height: auto; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
+}

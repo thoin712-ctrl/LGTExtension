@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="vendor/bootstrap.min.css" />
+    <link id="qt_ui_css" rel="stylesheet" href="popup/themes/admin.css" />
+    <link rel="stylesheet" href="popup.css" />
+</head>
+<body class="bg-light">
+        
+
+        <main class="qt-main qt-shell-no-sidebar">
+            <div id="section-top" class="qt-topbar sticky-top">
+                <div class="qt-topbar-inner">
+                    <div class="qt-topbar-left">
+                        <div class="h6 fw-bold mb-0">QUỲNH TOOLS</div>
+                        <div id="status" class="small text-secondary">Sẵn sàng...</div>
+                    </div>
+                    <div class="qt-topbar-right">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="UI theme switch">
+                            <input type="radio" class="btn-check" name="ui_theme" id="ui_theme_google" autocomplete="off" value="google" checked>
+                            <label class="btn btn-outline-secondary" for="ui_theme_google">Google</label>
+                            <input type="radio" class="btn-check" name="ui_theme" id="ui_theme_admin" autocomplete="off" value="admin">
+                            <label class="btn btn-outline-secondary" for="ui_theme_admin">Admin</label>
+                            <input type="radio" class="btn-check" name="ui_theme" id="ui_theme_ios" autocomplete="off" value="ios">
+                            <label class="btn btn-outline-secondary" for="ui_theme_ios">iOS</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="message" class="alert alert-danger py-2 mb-0 qt-topbar-alert"></div>
+                <div class="d-flex justify-content-end gap-2 mt-2">
+                    <button id="btn_accept_duplicate" class="btn btn-sm btn-secondary" type="button" style="display:none;">OK</button>
+                    <button id="btn_overwrite_duplicate" class="btn btn-sm btn-warning" type="button" style="display:none;">OVERWRITE</button>
+                    <button id="btn_cancel_action" class="btn btn-sm btn-danger" type="button" style="display:none;">CANCEL</button>
+                </div>
+            </div>
+
+            <div class="container-fluid py-3 qt-content">
+                <div class="qt-float-form">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-2">
+                        <label class="form-label mb-1">Số tài liệu</label>
+                        <div class="d-flex gap-1">
+                            <input id="doc_number" class="form-control form-control-sm" type="text" placeholder="Mã tài liệu..." />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label mb-1" for="approve_decision">Kết quả duyệt</label>
+                        <select id="approve_decision" class="form-select form-select-sm">
+                            <option value=""></option>
+                            <option value="DUYỆT">DUYỆT</option>
+                            <option value="KHÔNG DUYỆT">KHÔNG DUYỆT</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label mb-1" for="current_pr">Mã PR Hiện tại</label>
+                        <input id="current_pr" class="form-control form-control-sm" type="text" placeholder="(lấy từ web)" />
+                        <div id="current_pr_type" class="form-text small text-secondary"></div>
+                    </div>
+                    
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-3" id="qt-actions">
+                    <button id="btn_export_excel" class="btn btn-primary btn-sm" type="button">XUẤT WEB EXCEL</button>
+                    <button id="btn_approve" class="btn btn-warning btn-sm" type="button">DUYỆT</button>
+                </div>
+                </div>
+                <div class="qt-popup-tabs d-flex gap-2 mb-3" role="tablist" aria-label="Popup views" hidden>
+                    <button id="btn_tab_main" class="btn btn-sm btn-primary" type="button" data-qt-tab="main" aria-selected="true">TÁC VỤ</button>
+                    <button id="btn_tab_relation" class="btn btn-sm btn-outline-primary" type="button" data-qt-tab="relation" aria-selected="false">MAP PR-DOC</button>
+                </div>
+
+                <section id="panel_tab_main" class="qt-tab-panel" data-qt-panel="main">
+                <div class="card shadow-sm mb-3" id="section-web-history">
+                    <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="fw-semibold">History Web</div>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <input id="web_history_search" class="form-control form-control-sm" type="text" placeholder="Tìm PR / link..." style="width: 260px;" />
+                            <button id="btn_web_history_reload" class="btn btn-sm btn-outline-secondary" type="button">RELOAD</button>
+                            <span id="web_history_info" class="small fw-semibold text-secondary" style="min-width:80px; text-align:center;"></span>
+                        </div>
+                    </div>
+                    <div class="table-wrap history-wrap table-responsive">
+                        <table id="web_history_table" class="table table-sm table-bordered table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ngày duyệt</th>
+                                    <th>Mã PR</th>
+                                    <th>Link</th>
+                                </tr>
+                            </thead>
+                            <tbody id="web_history_table_body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-3" id="section-data">
+                    <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <div class="fw-semibold">Data kết quả (data_ket_qua.csv)</div>
+                            <div id="data_summary" class="small text-secondary"></div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <input id="data_search" class="form-control form-control-sm" type="text" placeholder="Tìm trên toàn bộ Firebase (chuỗi con; tải dữ liệu khi tìm)..." style="width: 360px;" />
+                            <button id="btn_data_clear_filters" class="btn btn-sm btn-outline-warning" type="button" title="Xóa tất cả bộ lọc cột (Excel-style)">XÓA LỌC</button>
+                            <select id="data_page_size" class="form-select form-select-sm w-auto">
+                                <option value="100">100 / page</option>
+                                <option value="250" selected>250 / page</option>
+                                <option value="500">500 / page</option>
+                            </select>
+                            <button id="btn_data_prev" class="btn btn-sm btn-outline-secondary" type="button">PREV</button>
+                            <span id="data_page_info" class="small fw-semibold text-secondary" style="min-width:110px; text-align:center;">1/1</span>
+                            <button id="btn_data_next" class="btn btn-sm btn-outline-secondary" type="button">NEXT</button>
+                            <button id="btn_data_load" class="btn btn-sm btn-outline-secondary" type="button">LOAD</button>
+                            <button id="btn_data_import" class="btn btn-sm btn-success" type="button">IMPORT</button>
+                            <input id="data_file" type="file" accept=".csv,.tsv,.txt,.xlsx" style="display:none" />
+                            <button id="btn_data_save" class="btn btn-sm btn-primary" type="button">SAVE</button>
+                            <button id="btn_data_export" class="btn btn-sm btn-success" type="button">EXPORT</button>
+                            <button id="btn_data_report" class="btn btn-sm btn-outline-primary" type="button">REPORT</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap data-wrap table-responsive">
+                        <table id="data_table" class="table table-sm table-bordered table-hover align-middle mb-0">
+                            <thead class="table-light"></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row g-3 qt-workspace">
+                    <div class="col-12">
+                        <div class="card shadow-sm" id="section-compare">
+                <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="fw-semibold">So sánh</div>
+                    <div class="d-flex gap-2 flex-wrap align-items-center">
+                        <div class="qt-compare-actions qt-compare-actions-excel" aria-label="Thao tác bên Excel">
+                            <span class="qt-compare-action-label">EXCEL</span>
+                            <button id="btn_reload" class="btn btn-sm btn-outline-secondary" type="button">RELOAD</button>
+                            <button id="btn_clear_excel" class="btn btn-sm btn-outline-danger" type="button">CLEAR</button>
+                            <div>
+                                <input id="excel_file" type="file" accept=".csv,.tsv,.txt,.xlsx" multiple style="display:none" />
+                                <label for="excel_file" class="btn btn-sm btn-outline-success">CHOOSE FILE</label>
+                            </div>
+                        </div>
+                        <div class="qt-compare-actions qt-compare-actions-web" aria-label="Thao tác bên Web">
+                            <span class="qt-compare-action-label">WEB</span>
+                            <button id="btn_clear_web" class="btn btn-sm btn-outline-danger" type="button">CLEAR</button>
+                            <div>
+                                <input id="right_excel_file" type="file" accept=".csv,.tsv,.txt,.xlsx" style="display:none" />
+                                <label for="right_excel_file" class="btn btn-sm btn-outline-success">CHOOSE FILE</label>
+                            </div>
+                            <button id="btn_clear_right_excel" class="btn btn-sm btn-outline-danger" type="button">CLEAR FILE PHẢI</button>
+                        </div>
+                        <div class="qt-compare-actions qt-compare-actions-common" aria-label="Thao tác chung">
+                            <span class="qt-compare-action-label">CHUNG</span>
+                            <button id="btn_compare" class="btn btn-sm btn-outline-secondary" type="button">SO SÁNH</button>
+                            <button id="btn_export_html" class="btn btn-sm btn-info text-white" type="button">XUẤT HTML DIFF</button>
+                        </div>
+                        <div class="qt-compare-actions qt-compare-actions-ai" aria-label="Tùy chọn AI">
+                            <span class="qt-compare-action-label">AI</span>
+                            <div class="form-check form-switch mb-0">
+                                <input id="compare_ai_match_toggle" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label small" for="compare_ai_match_toggle">AI MATCH</label>
+                            </div>
+                            <input id="compare_ai_match_api_key" class="form-control form-control-sm" type="password" placeholder="Google AI Studio API key" style="width: 320px;" />
+                        </div>
+                        <div class="form-text small text-secondary">Chỉ điền API key. Extension gửi yêu cầu qua backend Python local tới Google AI Studio.</div>
+                    </div>
+                </div>
+                <textarea id="excel_paste" style="display:none"></textarea>
+                <textarea id="right_excel_paste" style="display:none"></textarea>
+                <div class="card-body py-2">
+                    <div id="compare_summary" class="small fw-semibold text-secondary mb-2"></div>
+                    <div class="table-wrap table-responsive">
+                        <table id="compare_table" class="table table-sm table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="6">Excel</th>
+                                    <th colspan="8">Web</th>
+                                </tr>
+                                <tr>
+                                    <th>STT</th>
+                                    <th class="col-doc">Mã tài liệu</th>
+                                    <th>Mã VT</th>
+                                    <th>Tên VT</th>
+                                    <th>Đơn vị</th>
+                                    <th>Số lượng</th>
+                                    <th>STT</th>
+                                    <th class="col-doc">Mã tài liệu</th>
+                                    <th>Mã VT</th>
+                                    <th>Tên VT</th>
+                                    <th>Đơn vị</th>
+                                    <th>Số lượng</th>
+                                    <th>Ghi chú</th>
+                                    <th>Check</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                </div>
+                </section>
+
+                <section id="panel_tab_relation" class="qt-tab-panel d-none" data-qt-panel="relation">
+                    <div class="card shadow-sm mb-3" id="section-relation-map">
+                        <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div>
+                                <div class="fw-semibold">Map quan hệ PR - Tài liệu</div>
+                                <div id="relation_summary" class="small text-secondary"></div>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap align-items-center">
+                                <input id="relation_search" class="form-control form-control-sm" type="text" placeholder="Tìm PR / tài liệu / mã VT / tên VT..." style="width: 280px;" />
+                                <button id="btn_relation_reload" class="btn btn-sm btn-outline-secondary" type="button">RELOAD</button>
+                                <span id="relation_info" class="small fw-semibold text-secondary" style="min-width:110px; text-align:center;"></span>
+                            </div>
+                        </div>
+                        <div class="card-body py-2">
+                            <div id="relation_graph" class="relation-map-board mb-3"></div>
+                            <div class="table-wrap relation-trace-wrap table-responsive">
+                                <table id="relation_table" class="table table-sm table-bordered table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Mã tài liệu</th>
+                                            <th>Excel Lines</th>
+                                            <th>Tổng line</th>
+                                            <th>Đã duyệt</th>
+                                            <th>Đã hủy</th>
+                                            <th>Số PR</th>
+                                            <th>Chi tiết PR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="relation_table_body"></tbody>
+                                </table>
+                            </div>
+                            <div class="relation-detail-head d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+                                <div>
+                                    <div class="fw-semibold">Chi tiết line</div>
+                                    <div id="relation_detail_summary" class="small text-secondary">Chưa chọn PR hoặc tài liệu.</div>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap align-items-center">
+                                    <input id="relation_detail_search" class="form-control form-control-sm" type="text" placeholder="Tìm Tên VT / Mã VT / Trạng thái..." style="width: 280px;" />
+                                    <button id="btn_relation_detail_save" class="btn btn-sm btn-primary" type="button">LƯU CHỈNH SỬA</button>
+                                    <button id="btn_relation_detail_clear" class="btn btn-sm btn-outline-secondary" type="button">CLEAR CHI TIẾT</button>
+                                </div>
+                            </div>
+                            <div class="table-wrap relation-detail-wrap table-responsive mt-2">
+                                <table id="relation_detail_table" class="table table-sm table-bordered table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Số tài liệu</th>
+                                            <th>PR One</th>
+                                            <th>PR SAP</th>
+                                            <th>Mã VT</th>
+                                            <th>Tên VT</th>
+                                            <th>ĐVT</th>
+                                            <th>Số lượng</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ghi chú</th>
+                                            <th>STT Excel</th>
+                                            <th>STT Web</th>
+                                            <th>Ngày duyệt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="relation_detail_table_body"></tbody>
+                                </table>
+                            </div>
+                            <div class="relation-detail-head d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+                                <div>
+                                    <div class="fw-semibold">Map Source Doc ↔ Data kết quả</div>
+                                    <div id="relation_mapping_summary" class="small text-secondary">Chưa chọn tài liệu để map.</div>
+                                </div>
+                            </div>
+                            <div class="table-wrap relation-mapping-wrap table-responsive mt-2">
+                                <table id="relation_mapping_table" class="table table-sm table-bordered table-hover align-middle mb-0">
+                                    <thead class="table-light"></thead>
+                                    <tbody id="relation_mapping_table_body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="report_dialog" class="qt-dialog">
+        <div class="qt-dialog-head">
+            <div>
+                <div class="fw-semibold">Report summary (data_ket_qua)</div>
+                <div class="small text-secondary">Tổng hợp theo Mã tài liệu + PR One, lọc theo khoảng ngày duyệt.</div>
+            </div>
+            <button id="btn_report_close" class="btn btn-sm btn-outline-danger" type="button">ĐÓNG</button>
+        </div>
+        <div class="qt-dialog-body">
+            <div class="d-flex gap-2 flex-wrap align-items-center mb-2">
+                <input id="report_doc_filter" class="form-control form-control-sm" type="text" placeholder="Mã tài liệu..." style="width: 180px;" />
+                <input id="report_date_from" class="form-control form-control-sm" type="date" style="width: 170px;" />
+                <input id="report_date_to" class="form-control form-control-sm" type="date" style="width: 170px;" />
+                <button id="btn_report_refresh" class="btn btn-sm btn-primary" type="button">TẠO REPORT</button>
+                <button id="btn_report_export" class="btn btn-sm btn-success" type="button">XUẤT EXCEL</button>
+                <button id="btn_clear_report" class="btn btn-sm btn-outline-danger" type="button">CLEAR</button>
+            </div>
+            <div id="data_report_preview" class="report-preview"></div>
+        </div>
+    </dialog>
+    <script src="vendor/bootstrap.bundle.min.js"></script>
+    <script src="vendor/xlsx.mini.min.js"></script>
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
